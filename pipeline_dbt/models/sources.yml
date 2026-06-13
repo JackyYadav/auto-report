@@ -1,0 +1,7 @@
+version: 2
+
+sources:
+  - name: sales_data
+    dataset: sales_data
+    tables:
+      - name: Superstore_raw
