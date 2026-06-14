@@ -1,9 +1,9 @@
 SELECT 
     Category,
-    `Sub-Category` as Sub_Category,
+    sub_category as Sub_Category,
     SUM(Sales) as total_sales,
     SUM(Profit) as total_profit,
-    COUNT(`Order ID`) as total_orders
-FROM {{ source('sales_data', 'Superstore_raw') }}
-GROUP BY Category, `Sub-Category`
+    COUNT(order_id) as total_orders
+FROM {{ ref('stg_superstore') }}
+GROUP BY Category, sub_category
 ORDER BY total_sales DESC
