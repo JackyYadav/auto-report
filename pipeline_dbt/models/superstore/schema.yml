@@ -1,0 +1,58 @@
+version: 2
+
+models:
+  - name: stg_superstore
+    description: "Staging layer - cleans and renames columns from raw Superstore upload. Single source of truth for raw data access."
+    columns:
+      - name: order_id
+        description: "Unique order identifier"
+      - name: Category
+        description: "Product category"
+      - name: sub_category
+        description: "Product sub-category"
+      - name: Sales
+        description: "Revenue from this order line"
+      - name: Profit
+        description: "Profit from this order line"
+      - name: Quantity
+        description: "Number of units ordered"
+
+  - name: sales_by_category
+    description: "Aggregated sales and profit by category and sub-category. Built on stg_superstore."
+    columns:
+      - name: Category
+        description: "Product category (Furniture, Technology, Office Supplies)"
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Furniture', 'Technology', 'Office Supplies']
+      - name: Sub_Category
+        description: "Product sub-category"
+      - name: total_sales
+        description: "Sum of all sales for this category and sub-category"
+        tests:
+          - not_null
+      - name: total_profit
+        description: "Sum of all profit for this category and sub-category"
+      - name: total_orders
+        description: "Count of orders for this category and sub-category"
+
+  - name: top_categories
+    description: "Final summary table - one row per category with total sales, profit and margin. Built on sales_by_category."
+    columns:
+      - name: Category
+        description: "Product category - one row per category"
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('sales_by_category')
+                field: Category
+      - name: category_total_sales
+        description: "Total sales across all sub-categories in this category"
+      - name: category_total_profit
+        description: "Total profit across all sub-categories in this category"
+      - name: profit_margin_pct
+        description: "Profit as a percentage of total sales"
